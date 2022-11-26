@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # This script is meant solely for running on Nvidia JETSON inference device
+# Works on AGX XAVIER currently, modified according to this link
+# https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
 wget https://nvidia.box.com/shared/static/ssf2v7pf5i245fk4i0q926hy4imzs2ph.whl -O torch-1.11.0-cp38-cp38-linux_aarch64.whl
 sudo apt-get install python3-pip libopenblas-base libopenmpi-dev libomp-dev -y
 pip3 install Cython
