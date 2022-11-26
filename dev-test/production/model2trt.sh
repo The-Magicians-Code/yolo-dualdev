@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-shopt -s nullglob dotglob     # To include hidden files
-files=(/usr/local/bin/trtexec)
-if [ ${#files[@]} -gt 0 ]; 
-then
+if [ ! -f /usr/local/bin/trtexec ]; then
     echo "trtexec not set up. initialising"
-    sudo cp /usr/src/tensorrt/bin/trtexec /usr/local/bin/; 
+    sudo cp /usr/src/tensorrt/bin/trtexec /usr/local/bin/;
 fi
 # User defined ONNX model path without .onnx suffix
 model=""
