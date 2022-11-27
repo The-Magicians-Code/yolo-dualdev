@@ -47,10 +47,13 @@ model.eval().to("cuda")
 # For x86 systems
 if platform.machine() == "x86_64":
     cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+    app_port = 3001
+
 # For Jetson
 elif platform.machine() == "aarch64":
     cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
-
+    app_port = 3030
+    
 # colour = (B, G, R)
 colour = (0, 140, 255)
 thickness = 4
@@ -157,8 +160,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    # if args.perf:
-    #     main()
-    # else:
-        app.run(host='0.0.0.0', port=3001)
-    # app.run(host='0.0.0.0', port=3030) # For Jetson
+    app.run(host='0.0.0.0', port=app_port)
