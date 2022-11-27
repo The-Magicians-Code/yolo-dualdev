@@ -8,7 +8,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # RUN apt-get install -y libsm6 libxext6 libxrender-dev
 # RUN pip install opencv-python==4.5.5.64
 
-RUN pip install scikit-image pycuda seaborn flask-opencv-streamer
+RUN pip install scikit-image pycuda seaborn
 
 # OpenCV custom build instructions from:
 # https://medium.com/@galaktyk01/how-to-build-opencv-with-gstreamer-b11668fa09c
@@ -38,7 +38,7 @@ ocl-icd-opencl-dev
 WORKDIR /
 RUN git clone https://github.com/opencv/opencv.git
 WORKDIR /opencv
-RUN git checkout 4.5.4
+RUN git checkout 4.2.0
 
 # Build OpenCV
 RUN mkdir /opencv/build

@@ -12,10 +12,15 @@ model = torch.hub.load("ultralytics/yolov5", "custom", model_path) # This line i
 in_size = model.model.bindings["images"].shape[-1]  # Retrieve input size of the model
 model.eval().to("cuda")
 
-# cap = cv2.VideoCapture('filesrc location=../video.mp4 ! qtdemux ! queue ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER)
-cam0 = cv2.VideoCapture("video.mp4")
-cam1 = cv2.VideoCapture("videoplay.mp4")
-cam2 = cv2.VideoCapture("videoplayback.mp4")
+# For x86 systems
+videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
+cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+# For Jetson
+# cams = [cv2.VideoCapture('filesrc location=video.mp4 ! qtdemux ! queue ! h264parse ! nvv4l2dec ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+
+# cam0 = cv2.VideoCapture("video.mp4")
+# cam1 = cv2.VideoCapture("videoplay.mp4")
+# cam2 = cv2.VideoCapture("videoplayback.mp4")
 
 # colour = (B, G, R)
 colour = (0, 140, 255)
@@ -64,7 +69,7 @@ def plotdetections(detection, stream):
     return stream
 
 def gen_frames():
-    online, frame = openstreams([cam0, cam1, cam2])
+    online, frame = openstreams(cams)
     height, width = frame[0].shape[:2]
     streams_ok = all(online)
     fps = 0
@@ -74,9 +79,9 @@ def gen_frames():
     top_left = (32, 38)
 
     with torch.no_grad():
-        while streams_ok:
+        while True:
             #Capture frame-by-frame
-            online, streams = openstreams([cam0, cam1, cam2])
+            online, streams = openstreams(cams)
             streams_ok = all(online)
             # FPS calculation
             now = time.time()
