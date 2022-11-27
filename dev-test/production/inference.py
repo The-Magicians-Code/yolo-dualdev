@@ -95,7 +95,7 @@ def gen_frames():
             # FPS calculation
             now = time.time()
             if now > tau:  # avoid div0
-                fps = fps*smoothing + 0.1/(now - tau)
+                fps = fps * smoothing + 0.1/(now - tau)
             tau = now
             
             inputs = [cv2.resize(stream, (img_size, img_size)) for stream in streams]
