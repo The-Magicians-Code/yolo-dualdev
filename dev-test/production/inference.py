@@ -9,31 +9,43 @@ import cv2
 import time
 import torch
 import argparse
+import platform
 from flask import Flask, render_template, Response
 
 parser = argparse.ArgumentParser(description="Neural Network inference on video stream(s)")
 parser.add_argument('--input-video', help="Read a video")
 # parser.add_argument('--no-model', action='store_true', help="Do not run a model")
-parser.add_argument('--model', default="models/yolov5m6_640x640_batch_1.engine", help="YOLOv5 Neural Network for object detection")
+parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
+parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
+parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
 args = parser.parse_args()
 
 app = Flask(__name__)
 
 # User defined variables
-# model_path = "models/yolov5m6_640x640_batch_1.engine"
 videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
 
 # model = torch.hub.load("ultralytics/yolov5", model_path, pretrained=True) # Load unoptimised model from Ultralytics servers
-model = torch.hub.load("ultralytics/yolov5", "custom", args.model) # This line is important since it contains RT execution
-input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
-img_size = input_params[-1] # One dimension since n x n shape
-batch_size = input_params[0]
+if args.rt_model:
+    model = torch.hub.load("ultralytics/yolov5", "custom", f"models/{args.rt_model}.engine") # This line is important since it contains RT execution
+    input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
+    img_size = input_params[-1] # One dimension since n x n shape
+    batch_size = input_params[0]
+elif args.model and args.imsize:
+    model = torch.hub.load("ultralytics/yolov5", args.model, pretrained=True) # Load unoptimised model from Ultralytics servers
+    img_size = int(args.imsize)
+    batch_size = len(videos)
+elif args.model and not args.imsize:
+    parser.error("--model argument requires --imsize argument")
+    
 model.eval().to("cuda")
 
 # For x86 systems
-cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+if platform.machine() == "x86_64":
+    cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
 # For Jetson
-# cams = [cv2.VideoCapture('filesrc location=video.mp4 ! qtdemux ! queue ! h264parse ! nvv4l2dec ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+elif platform.machine() == "aarch64":
+    cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! nvv4l2dec ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
 
 # colour = (B, G, R)
 colour = (0, 140, 255)
