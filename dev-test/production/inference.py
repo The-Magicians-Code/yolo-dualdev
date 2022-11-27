@@ -17,6 +17,9 @@ parser.add_argument('--input-video', required=True, nargs="+", help="Read video 
 # parser.add_argument('--no-model', action='store_true', help="Do not run a model")
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
+parser.add_argument('--perf', action='store_true')
+# parser.add_argument('--no-perf', dest='perf', action='store_false')
+parser.set_defaults(perf=False)
 parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
 args = parser.parse_args()
 
@@ -131,12 +134,16 @@ def main():
             # Display fps
             [cv2.putText(stream, pos, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2) for pos, stream in zip(["Port", "Bow", "Starboard"], streams)]
             outs = cv2.hconcat([cv2.putText(stream, f"{int(fps)}", fps_pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 2) for stream in streams])
-            online, buffer = cv2.imencode('.jpg', outs)
-            outs = buffer.tobytes()
+    
             # if cv2.waitKey(1) & 0xFF == ord('q'): # Disabled for performance
             #     break
-            yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + outs + b'\r\n')
+            if args.perf:
+                print(f"{fps:.2f}")   # Display fps  
+            else:
+                online, buffer = cv2.imencode('.jpg', outs)
+                outs = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + outs + b'\r\n')
             # print(f"{fps:.2f}")   # Display fps
             
 @app.route('/video_feed')
@@ -150,6 +157,8 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3001)
+    # if args.perf:
+    #     main()
+    # else:
+        app.run(host='0.0.0.0', port=3001)
     # app.run(host='0.0.0.0', port=3030) # For Jetson
-# main()
