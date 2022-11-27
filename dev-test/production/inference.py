@@ -6,7 +6,7 @@ from flask import Flask, render_template, Response
 
 app = Flask(__name__)
 
-model_path = "models/yolov5m6_640x640_batch_3.engine"
+model_path = "models/yolov5m6_640x640_batch_1.engine"
 
 # model = torch.hub.load('ultralytics/yolov5', 'yolov5s6', pretrained=True)
 model = torch.hub.load("ultralytics/yolov5", "custom", model_path) # This line is important since it contains RT execution

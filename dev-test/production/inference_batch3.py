@@ -49,7 +49,7 @@ def plotdetections(detection, stream):
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{int(confidence * 100.0)}%"
         
-        label = "" # detection.iloc[i]["name"]
+        # label = "" # detection.iloc[i]["name"]
         
         cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
         font = cv2.FONT_HERSHEY_SIMPLEX

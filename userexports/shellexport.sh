@@ -15,7 +15,7 @@ declare -a models=(
 # Model input size (a x a)
 size=640
 # Input batch size
-batch=3
+batch=1
 
 echo "Making the folder for models"
 mkdir models_"$size"x"$size"_batch_"$batch"
