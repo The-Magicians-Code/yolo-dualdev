@@ -13,7 +13,7 @@ import platform
 from flask import Flask, render_template, Response
 
 parser = argparse.ArgumentParser(description="Neural Network inference on video stream(s)")
-parser.add_argument('--input-video', nargs="+", help="Read video file(s) --input-video video0.mp4 video1.mp4 ...")
+parser.add_argument('--input-video', required=True, nargs="+", help="Read video file(s) --input-video video0.mp4 video1.mp4 ...")
 # parser.add_argument('--no-model', action='store_true', help="Do not run a model")
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
@@ -22,14 +22,11 @@ args = parser.parse_args()
 
 app = Flask(__name__)
 
-# User defined variables
-# videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
-if args.input_video:
-    videos = args.input_video
-else:
-    videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
+# if args.input_video:
+videos = args.input_video
+# else:
+    # videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
 
-# model = torch.hub.load("ultralytics/yolov5", model_path, pretrained=True) # Load unoptimised model from Ultralytics servers
 if args.rt_model:
     model = torch.hub.load("ultralytics/yolov5", "custom", f"models/{args.rt_model}.engine") # This line is important since it contains RT execution
     input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
@@ -49,7 +46,7 @@ if platform.machine() == "x86_64":
     cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
 # For Jetson
 elif platform.machine() == "aarch64":
-    cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! nvv4l2dec ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
+    cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
 
 # colour = (B, G, R)
 colour = (0, 140, 255)
@@ -101,7 +98,7 @@ def main():
     if len(cams) != batch_size:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")
     online, frame = openstreams(cams)
-    if not any(online):
+    if not all(online):
         print("At least one stream can not be captured")
         return
     height, width = frame[0].shape[:2]
@@ -116,8 +113,9 @@ def main():
         while True:
             #Capture frame-by-frame
             online, streams = openstreams(cams)
-            streams_ok = any(online)
+            streams_ok = all(online)
             if not streams_ok:
+                print("At least one stream went offline")
                 break
             # FPS calculation
             now = time.time()
