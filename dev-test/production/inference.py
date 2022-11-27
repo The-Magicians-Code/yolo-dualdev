@@ -63,22 +63,21 @@ def plotdetections(detection, stream):
         
         cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        # (w, h), _ = cv2.getTextSize(
-        #         f"{label}: " + score_txt, font, fontscale, fontthick)
 
         # This block for seeing the values on detection boxes
+        # (w, h), _ = cv2.getTextSize(f"{label}: " + score_txt, font, fontscale, fontthick)
         # cv2.rectangle(streams, (xmin, ymax - h - 10), (xmin + w, ymax), colour, -1) # -1 to fill the rectangle
         # cv2.putText(stream, f"{label}: {score_txt}", (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
         cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
     
     return stream
 
-def gen_frames():
+def main():
     if len(cams) != batch_size:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")
     online, frame = openstreams(cams)
     height, width = frame[0].shape[:2]
-    # streams_ok = all(online)
+
     fps = 0
     tau = time.time()
     smoothing = 0.9
@@ -117,7 +116,7 @@ def gen_frames():
 @app.route('/video_feed')
 def video_feed():
     # Video streaming route. Put this in the src attribute of an img tag
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(main(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/')
 def index():
@@ -127,4 +126,4 @@ def index():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3001)
     # app.run(host='0.0.0.0', port=3030) # For Jetson
-# gen_frames()
+# main()
