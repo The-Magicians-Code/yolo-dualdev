@@ -61,5 +61,7 @@ RUN make -j$(nproc)
 RUN make install
 RUN ldconfig
 
+RUN pip install seaborn tqdm
+
 WORKDIR /workspace/torching
 EXPOSE 3000

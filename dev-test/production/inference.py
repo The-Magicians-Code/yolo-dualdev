@@ -6,7 +6,7 @@ from flask import Flask, render_template, Response
 
 app = Flask(__name__)
 
-model_path = "models/yolov5s6.engine"
+model_path = "models/yolov5m6_640x640_batch_3.engine"
 
 # model = torch.hub.load('ultralytics/yolov5', 'yolov5s6', pretrained=True)
 model = torch.hub.load("ultralytics/yolov5", "custom", model_path) # This line is important since it contains RT execution
@@ -14,7 +14,7 @@ in_size = model.model.bindings["images"].shape[-1]  # Retrieve input size of the
 model.eval().to("cuda")
 
 # cap = cv2.VideoCapture('filesrc location=../video.mp4 ! qtdemux ! queue ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER)
-cap = cv2.VideoCapture("../video.mp4")
+cap = cv2.VideoCapture("video.mp4")
 
 def gen_frames():
     ret, frame = cap.read()
