@@ -13,7 +13,7 @@ import platform
 from flask import Flask, render_template, Response
 
 parser = argparse.ArgumentParser(description="Neural Network inference on video stream(s)")
-parser.add_argument('--input-video', help="Read a video")
+parser.add_argument('--input-video', nargs="+", help="Read video file(s) --input-video video0.mp4 video1.mp4 ...")
 # parser.add_argument('--no-model', action='store_true', help="Do not run a model")
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
@@ -23,7 +23,11 @@ args = parser.parse_args()
 app = Flask(__name__)
 
 # User defined variables
-videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
+# videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
+if args.input_video:
+    videos = args.input_video
+else:
+    videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
 
 # model = torch.hub.load("ultralytics/yolov5", model_path, pretrained=True) # Load unoptimised model from Ultralytics servers
 if args.rt_model:
@@ -97,7 +101,7 @@ def main():
     if len(cams) != batch_size:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")
     online, frame = openstreams(cams)
-    if not all(online):
+    if not any(online):
         print("At least one stream can not be captured")
         return
     height, width = frame[0].shape[:2]
@@ -112,7 +116,7 @@ def main():
         while True:
             #Capture frame-by-frame
             online, streams = openstreams(cams)
-            streams_ok = all(online)
+            streams_ok = any(online)
             if not streams_ok:
                 break
             # FPS calculation
