@@ -129,8 +129,7 @@ def main():
                 fps = fps * smoothing + 0.1/(now - tau)
             tau = now
             
-            # inputs = streams    # On Jetson
-            inputs = [cv2.resize(stream, (img_size, img_size)) for stream in streams]   # Required for x86_64
+            inputs = [cv2.resize(stream, (img_size, img_size)) for stream in streams]
             results = model(inputs, size=img_size)
             detections = results.pandas().xyxy
 
