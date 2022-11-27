@@ -8,15 +8,23 @@
 import cv2
 import time
 import torch
+import argparse
 from flask import Flask, render_template, Response
+
+parser = argparse.ArgumentParser(description="Neural Network inference on video stream(s)")
+parser.add_argument('--input-video', help="Read a video")
+# parser.add_argument('--no-model', action='store_true', help="Do not run a model")
+parser.add_argument('--model', default="models/yolov5m6_640x640_batch_1.engine", help="YOLOv5 Neural Network for object detection")
+args = parser.parse_args()
 
 app = Flask(__name__)
 
 # User defined variables
-model_path = "models/yolov5m6_640x640_batch_3.engine"
+# model_path = "models/yolov5m6_640x640_batch_1.engine"
 videos = ["video.mp4", "videoplay.mp4", "videoplayback.mp4"]
 
-model = torch.hub.load("ultralytics/yolov5", "custom", model_path) # This line is important since it contains RT execution
+# model = torch.hub.load("ultralytics/yolov5", model_path, pretrained=True) # Load unoptimised model from Ultralytics servers
+model = torch.hub.load("ultralytics/yolov5", "custom", args.model) # This line is important since it contains RT execution
 input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
 img_size = input_params[-1] # One dimension since n x n shape
 batch_size = input_params[0]
@@ -42,6 +50,7 @@ def openstreams(cameras):
     Returns:
         states, frames (list, list): stream status True / False and current frame
     """
+    
     states, frames = zip(*[camera.read() for camera in cameras])
     return states, frames
 
@@ -76,6 +85,9 @@ def main():
     if len(cams) != batch_size:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")
     online, frame = openstreams(cams)
+    if not all(online):
+        print("At least one stream can not be captured")
+        return
     height, width = frame[0].shape[:2]
 
     fps = 0
