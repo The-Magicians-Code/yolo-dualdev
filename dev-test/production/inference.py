@@ -47,7 +47,7 @@ model.eval().to("cuda")
 # For x86 systems
 if platform.machine() == "x86_64":
     cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! avdec_h264 ! videoconvert ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
-    app_port = 3001
+    app_port = 3000
 
 # For Jetson
 elif platform.machine() == "aarch64":
