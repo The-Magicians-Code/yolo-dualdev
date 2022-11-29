@@ -8,7 +8,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 # RUN apt-get install -y libsm6 libxext6 libxrender-dev
 # RUN pip install opencv-python==4.5.5.64
 
-RUN pip install scikit-image pycuda seaborn
+RUN pip install scikit-image pycuda seaborn tqdm
+RUN pip install flask-opencv-streamer --no-deps
+RUN pip install cryptography flask
 
 # OpenCV custom build instructions from:
 # https://medium.com/@galaktyk01/how-to-build-opencv-with-gstreamer-b11668fa09c
@@ -60,8 +62,6 @@ RUN make -j$(nproc)
 # Install OpenCV
 RUN make install
 RUN ldconfig
-
-RUN pip install seaborn tqdm
 
 WORKDIR /workspace/torching
 EXPOSE 3000
