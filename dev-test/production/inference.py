@@ -3,7 +3,7 @@
 # @Github: https://github.com/The-Magicians-Code
 # @Script: inference.py
 # @Description: Perform inference on user defined input streams, using preconfigured YOLOv5 TensorRT model
-# @Last modified: 2022/11/29
+# @Last modified: 2022/11/30
 
 import cv2
 import time
@@ -11,7 +11,7 @@ import torch
 import argparse
 import platform
 from pathlib import Path
-from flask import Flask, render_template, Response
+from flask_opencv_streamer.streamer import Streamer
 
 parser = argparse.ArgumentParser(description="Neural Network inference on video stream(s)")
 parser.add_argument('--rec', help="Record the stream into a video file --rec out.mp4")
@@ -21,8 +21,6 @@ parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input si
 parser.add_argument('--perf', action='store_true')
 parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
 args = parser.parse_args()
-
-app = Flask(__name__)
 
 if args.rec:
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -48,8 +46,11 @@ elif args.model and args.imsize:
     batch_size = len(videos)
 elif args.model and not args.imsize:
     parser.error("--model argument requires --imsize argument")
-    
-model.eval().to("cuda")
+if args.rt_model or args.model:
+    model.eval().to("cuda")
+else:
+    model = 0
+    batch_size = 0
 
 if platform.machine() == "x86_64":  # For PC
     decoder = "avdec_h264"
@@ -110,7 +111,7 @@ def plotdetections(detection, stream):
     return stream
 
 def main():
-    if len(cams) != batch_size:
+    if len(cams) != batch_size and model:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")
     
     online, frame = openstreams(cams)
@@ -120,8 +121,12 @@ def main():
     
     height, width = frame[0].shape[:2]
 
+    stream_res = (len(frame) * width, height)
+    streamer = Streamer(app_port, False, stream_res= stream_res)
     if args.rec:
-        output_video = cv2.VideoWriter(str(video_file), fourcc, 10, (len(frame) * width, height))
+        output_video = cv2.VideoWriter(str(video_file), fourcc, 10, stream_res)
+    else:
+        output_video = None
     
     fps = 0
     tau = time.time()
@@ -164,20 +169,13 @@ def main():
                 print(f"{fps:.2f}")   # Display fps  
             else:
                 online, buffer = cv2.imencode('.jpg', outs)
-                outs = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + outs + b'\r\n')
-            # print(f"{fps:.2f}")   # Display fps        
-            
-@app.route('/video_feed')
-def video_feed():
-    # Video streaming route. Put this in the src attribute of an img tag
-    return Response(main(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/')
-def index():
-    """Video streaming home page."""
-    return render_template('index.html')
-
+                streamer.frame_to_stream = buffer.tobytes()
+                
+                if not streamer.is_streaming:
+                    streamer.start_streaming()
+    
+    if output_video != None:
+        output_video.release()
+                
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=app_port)
+    main()
