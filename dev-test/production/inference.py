@@ -62,7 +62,6 @@ elif platform.machine() == "aarch64":   # For Jetson
 
 # Setup the cameras
 cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! {decoder} ! {video_converter} ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
-
     
 # colour = (B, G, R)
 colour = (0, 140, 255)
