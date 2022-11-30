@@ -62,6 +62,7 @@ def benchmark(model, input_shape=(1024, 1, 32, 32), dtype='fp32', nwarmup=50, nr
             if not i % 10 and verbose:
                 print('Iteration %d/%d, avg batch time %.2f ms' % (i, nruns, np.mean(timings) * 1000))
 
+    print("Output shape:", outs.shape)
     print("Input shape:", model_input.size())
     print('Average batch time: %.2f ms' % (np.mean(timings) * 1000))
     print('Average FPS: %0.0f' % (1.0 / np.mean(timings)))
