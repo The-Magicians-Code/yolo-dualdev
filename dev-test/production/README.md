@@ -15,7 +15,7 @@ That's all good and stuff, but how the fuck am I going to export my models?
 Speak no more:  
 ``cd hostitems/``  
 ``bash shellexport.sh``  
-Open the shellexport file with nano (or VSCode when attached to container) for example to edit the requested model types and their parameters  
+Open the shellexport file with nano (or [VSCode when attached to container](https://code.visualstudio.com/docs/devcontainers/attach-container)) for example to edit the requested model types and their parameters  
 ``nano shellexport.sh``  
 ## Tips?
 Sure! If you happen to use VSCode, then check out [Developing in Docker](https://code.visualstudio.com/docs/devcontainers/containers)  
