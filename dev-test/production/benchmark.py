@@ -10,7 +10,7 @@ import torch
 import argparse
 import numpy as np
 from pathlib import Path
-from subprocess import call
+from subprocess import Popen, DEVNULL, STDOUT
 
 parser = argparse.ArgumentParser(description="Neural Network benchmark script")
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 try:
     # When ImportError: /lib/aarch64-linux-gnu/libGLdispatch.so.0: cannot allocate memory in static TLS block
-    call("bash export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0".split())
+    Popen("export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0".split(), shell=True, stdout=DEVNULL, stderr=STDOUT)
 except ImportError as e:
     print(e)
 
