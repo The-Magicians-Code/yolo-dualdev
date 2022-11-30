@@ -95,11 +95,12 @@ def plotdetections(detection, stream):
         ymax = int(detection.iloc[i]["ymax"] / (img_size) * (height))
         # print(xmin, xmax)
         confidence = detection.iloc[i]['confidence']
-        score_txt = f"{int(confidence * 100.0)}%"
+        score_txt = f"{(confidence * 100.0):.0f}%"
         
         # label = "" # detection.iloc[i]["name"]
         
-        cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
+        # cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
+        cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         # This block for seeing the values on detection boxes
@@ -159,8 +160,9 @@ def main():
 
                 streams = [plotdetections(detection, stream) for detection, stream in zip(detections, streams)]
                 # Display fps
-            [cv2.putText(stream, pos, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2) for pos, stream in zip(["Port", "Bow", "Starboard"], streams)]
-            outs = cv2.hconcat([cv2.putText(stream, f"{int(fps)}", fps_pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 2) for stream in streams])
+            # [cv2.putText(stream, pos, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2) for pos, stream in zip(["Port", "Bow", "Starboard"], streams)]
+            cv2.putText(streams[0], f"{fps:.0f}", fps_pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 2)
+            outs = cv2.hconcat(streams)
             
             if args.rec:
                 output_video.write(outs)
