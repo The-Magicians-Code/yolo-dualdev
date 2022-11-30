@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 try:
     # When ImportError: /lib/aarch64-linux-gnu/libGLdispatch.so.0: cannot allocate memory in static TLS block
-    call("export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0")
+    call("export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0".split())
 except ImportError as e:
     print(e)
 
