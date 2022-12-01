@@ -155,7 +155,7 @@ def main():
     if platform.machine() == "x86_64":
         plotdetections = plotdetections_x86_64
     elif platform.machine() == "aarch64":
-        plotdetections == plotdetections_aarch64
+        plotdetections = plotdetections_aarch64
 
     fps = 0
     tau = time.time()
