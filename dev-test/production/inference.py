@@ -118,10 +118,10 @@ def plotdetections_aarch64(detection, stream):
         if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
             continue
 
-        xmin = detection.iloc[i]["xmin"]
-        xmax = detection.iloc[i]["xmax"]
-        ymin = detection.iloc[i]["ymin"]
-        ymax = detection.iloc[i]["ymax"]
+        xmin = int(detection.iloc[i]["xmin"])
+        xmax = int(detection.iloc[i]["xmax"])
+        ymin = int(detection.iloc[i]["ymin"])
+        ymax = int(detection.iloc[i]["ymax"])
 
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{(confidence * 100.0):.0f}%"
