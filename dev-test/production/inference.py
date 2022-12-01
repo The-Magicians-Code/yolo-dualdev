@@ -56,10 +56,12 @@ if platform.machine() == "x86_64":  # For PC
     decoder = "avdec_h264"
     video_converter = "videoconvert"
     app_port = 3000
+    resize = True
 elif platform.machine() == "aarch64":   # For Jetson
     decoder = "nvv4l2decoder"
     video_converter = "nvvidconv"
     app_port = 3030
+    resize = False
 
 # Setup the cameras
 cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! {decoder} ! {video_converter} ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
@@ -83,7 +85,7 @@ def openstreams(cameras):
     states, frames = zip(*[camera.read() for camera in cameras])
     return states, frames
 
-def plotdetections(detection, stream):
+def plotdetections_x86_64(detection, stream):
     height, width = stream.shape[:2]
     for i in range(detection.shape[0]):    
         if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
@@ -99,8 +101,8 @@ def plotdetections(detection, stream):
         
         # label = "" # detection.iloc[i]["name"]
         
-        # cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
-        cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
+        cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
+        # cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         # This block for seeing the values on detection boxes
@@ -110,6 +112,27 @@ def plotdetections(detection, stream):
         cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
     
     return stream
+
+def plotdetections_aarch64(detection, stream):
+    for i in range(detection.shape[0]):    
+        if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
+            continue
+
+        xmin = detection.iloc[i]["xmin"]
+        xmax = detection.iloc[i]["xmax"]
+        ymin = detection.iloc[i]["ymin"]
+        ymax = detection.iloc[i]["ymax"]
+
+        confidence = detection.iloc[i]['confidence']
+        score_txt = f"{(confidence * 100.0):.0f}%"
+
+        cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+
+        cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
+    
+    return stream
+
 
 def main():
     if len(cams) != batch_size and model:
@@ -123,12 +146,17 @@ def main():
     height, width = frame[0].shape[:2]
 
     stream_res = (len(frame) * width, height)
-    streamer = Streamer(app_port, False, stream_res= stream_res)
+    streamer = Streamer(app_port, False, stream_res=stream_res)
     if args.rec:
         output_video = cv2.VideoWriter(str(video_file), fourcc, 10, stream_res)
     else:
         output_video = None
     
+    if platform.machine() == "x86_64":
+        plotdetections = plotdetections_x86_64
+    elif platform.machine() == "aarch64":
+        plotdetections == plotdetections_aarch64
+
     fps = 0
     tau = time.time()
     smoothing = 0.9
@@ -154,10 +182,12 @@ def main():
             tau = now
             
             if args.model or args.rt_model:
-                inputs = [cv2.resize(stream, (img_size, img_size)) for stream in streams]
+                if resize:
+                    inputs = [cv2.resize(stream, (img_size, img_size)) for stream in streams]
+                else:
+                    inputs = streams
                 results = model(inputs, size=img_size)
                 detections = results.pandas().xyxy
-
                 streams = [plotdetections(detection, stream) for detection, stream in zip(detections, streams)]
                 # Display fps
             # [cv2.putText(stream, pos, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2) for pos, stream in zip(["Port", "Bow", "Starboard"], streams)]
