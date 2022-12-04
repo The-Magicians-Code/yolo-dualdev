@@ -133,7 +133,6 @@ def plotdetections_aarch64(detection, stream):
     
     return stream
 
-
 def main():
     if len(cams) != batch_size and model:
         raise ValueError(f"Number of input streams has to be equal to the model's batch size {len(cams)} != {batch_size}")

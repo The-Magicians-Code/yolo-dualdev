@@ -70,13 +70,83 @@ class TrtModel:
         return [out.host.reshape(batch_size, -1) for out in self.outputs]
 
 if __name__ == "__main__":
-    model_path = "models/yolov5m6_640x640_batch_3.engine"
+    model_path = "models/yolov5m6_640x640_batch_1.engine"
     batch_size = int(model_path.split(".")[0][-1])
     trt_engine_path = os.path.join(model_path)
     model = TrtModel(trt_engine_path, dtype=np.float16)
     shape = model.engine.get_binding_shape(0)
     
-    data = np.random.randint(0, 255, (batch_size, *shape[1:])) / 255
+    import cv2
+    img = cv2.imread("ship2.jpeg")
+    print(img.shape)
+    pic = img[...,::-1]
+
+    size = shape[2:]
+    data = cv2.resize(pic, size)
+
+    # data = np.random.randint(0, 255, (batch_size, *shape[1:])) / 255
     result = model(data, batch_size)
-    print(result)
-    print(result[0].shape)
+    dimensions = 85
+    rows = int(result[0].shape[1] / dimensions)
+    batch_size_out = result[0].shape[0]
+    confidence_index = 4
+    label_index = 5
+
+    result = np.reshape(result[0], (batch_size_out, rows, dimensions))
+
+    locations = []
+    labels = []
+    confidences = []
+
+    # print(result[0].shape)
+    # print(result[0][0][np.argmax(result[0][0])])
+    # print(result.shape)
+
+    print(result.shape)
+
+    i = 0
+    classes = result[0][i][5:]
+    boxes = result[0][i][:4]
+    confidence = result[0][i][4]
+    # print(boxes, confidence)
+    # print(classes.shape)
+    best_class_index = np.argmax(classes)
+    # print(best_class_index)
+    # print(classes[best_class_index])
+    dh, dw = img.shape[:2]
+    for i in range(1):
+        continue
+        classes = result[0][i][5:]
+        boxes = result[0][i][:4]
+        confidence = result[0][i][4]
+
+        best_class_index = np.argmax(classes)
+        best_class = classes[best_class_index]
+
+        print(f"Best class: {best_class_index}, score: {best_class}\nBoxes: {boxes}\nConfidence: {confidence}")
+        # print(f"Classes: {classes}\nBoxes: {boxes}\nConfidence: {confidence}")
+
+        x, y, w, h = boxes
+
+        l = int((x - w / 2) * dw)
+        r = int((x + w / 2) * dw)
+        t = int((y - h / 2) * dh)
+        b = int((y + h / 2) * dh)
+        
+        if l < 0:
+            l = 0
+        if r > dw - 1:
+            r = dw - 1
+        if t < 0:
+            t = 0
+        if b > dh - 1:
+            b = dh - 1
+
+        cv2.rectangle(img, (l, t), (r, b), (0, 0, 255), 2)
+        cv2.imwrite("ohcock.jpg", img)
+    import torch
+    from nms import *
+    batch_detections = torch.from_numpy(np.array(result))
+    # print(batch_detections)
+    batch_detections = non_max_suppression(batch_detections)
+    print(batch_detections[0].shape)
