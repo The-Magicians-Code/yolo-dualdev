@@ -149,4 +149,4 @@ if __name__ == "__main__":
     batch_detections = torch.from_numpy(np.array(result))
     # print(batch_detections)
     batch_detections = non_max_suppression(batch_detections)
-    print(batch_detections[0].shape)
+    print(batch_detections[0][0])
