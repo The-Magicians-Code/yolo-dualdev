@@ -146,7 +146,21 @@ if __name__ == "__main__":
         cv2.imwrite("ohcock.jpg", img)
     import torch
     from nms import *
+
     batch_detections = torch.from_numpy(np.array(result))
     # print(batch_detections)
     batch_detections = non_max_suppression(batch_detections)
-    print(batch_detections[0][0])
+    # print(batch_detections[0][0])
+
+    dh, dw = img.shape[:2]
+    model_input_size = 640
+    for i in range(batch_detections[0].shape[0]):
+        boxes = [i / model_input_size for i in batch_detections[0][i][:4]]
+        xmin, ymin, xmax, ymax = int(boxes[0] * dw), int(boxes[1] * dh), int(boxes[2] * dw), int(boxes[3] * dh)
+        print(xmin, ymin, xmax, ymax)
+        confidence = batch_detections[0][i][4]
+        class_id = batch_detections[0][i][5]
+
+        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+    
+    cv2.imwrite("ohcock.jpg", img)
