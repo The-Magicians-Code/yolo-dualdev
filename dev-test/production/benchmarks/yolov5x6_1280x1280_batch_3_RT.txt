@@ -1,0 +1,7 @@
+Model name: yolov5x6_1280x1280_batch_3.engine
+Input shape: torch.Size([3, 3, 1280, 1280])
+Model precision: fp16
+GPU: NVIDIA GeForce RTX 3090 Ti
+Stats for 1000 runs:
+Average inference time: 32.60 ms
+Average FPS: 31

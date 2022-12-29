@@ -88,8 +88,8 @@ def openstreams(cameras):
 def plotdetections_x86_64(detection, stream):
     height, width = stream.shape[:2]
     for i in range(detection.shape[0]):    
-        if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
-            continue
+        # if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
+        #     continue
 
         xmin = int(detection.iloc[i]["xmin"] / (img_size) * (width))
         xmax = int(detection.iloc[i]["xmax"] / (img_size) * (width))
@@ -99,7 +99,7 @@ def plotdetections_x86_64(detection, stream):
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{(confidence * 100.0):.0f}%"
         
-        # label = "" # detection.iloc[i]["name"]
+        label = detection.iloc[i]["name"]
         
         cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
         # cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
@@ -108,8 +108,8 @@ def plotdetections_x86_64(detection, stream):
         # This block for seeing the values on detection boxes
         # (w, h), _ = cv2.getTextSize(f"{label}: " + score_txt, font, fontscale, fontthick)
         # cv2.rectangle(streams, (xmin, ymax - h - 10), (xmin + w, ymax), colour, -1) # -1 to fill the rectangle
-        # cv2.putText(stream, f"{label}: {score_txt}", (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
-        cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
+        cv2.putText(stream, f"{label}: {score_txt}", (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
+        # cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
     
     return stream
 
