@@ -89,7 +89,11 @@ def benchmark(model, input_shape=(1024, 1, 32, 32), dtype='fp32', nwarmup=50, nr
             f"GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}",
             f"Stats for {nruns} runs:",
             "Average inference time: %.2f ms" % (np.mean(timings) * 1000),
-            "Average FPS: %0.0f" % (1.0 / np.mean(timings))
+            "Average FPS: %0.0f" % (1.0 / np.mean(timings)),
+            " ",
+            "CSV format:",
+            ",".join(["Model_name", "Input_shape", "Batch_size", "Channels", "Image_size", "Precision", "GPU", "Number_of_runs", "Avg_inference_time_(ms)", "Avg_FPS"]),
+            ",".join(str(i) for i in [model_name, model_input.size(), input_shape[0], input_shape[1], f"{input_shape[2]}x{input_shape[3]}", dtype, torch.cuda.get_device_name(torch.cuda.current_device()), nruns, np.mean(timings) * 1000, 1.0 / np.mean(timings)])
         ]
         with open(f"benchmarks/{outfile}", "w") as out:
             out.write("\n".join(outdata))
