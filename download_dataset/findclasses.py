@@ -52,8 +52,8 @@ def generate():
 
 with open("/mnt/d/yolodatasets/ships2/all_classes.txt", "r") as all:
     classes = all.read().split("\n")
-print(classes)
-[Path(f"/mnt/d/yolodatasets/ships2/{folder}").mkdir(parents=True, exist_ok=True) for folder in classes]
+    print(classes)
+    [Path(f"/mnt/d/yolodatasets/ships2/{folder}").mkdir(parents=True, exist_ok=True) for folder in classes]
 
 with open("/mnt/d/yolodatasets/ships2/filtered.txt", "r") as all:
     items = all.read().split("\n")
