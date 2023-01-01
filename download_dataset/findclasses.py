@@ -20,7 +20,7 @@ def openfile(file):
     """
     
     with open(file, "r") as f:
-        return f"{f.read()},{Path(file).with_suffix('.jpg')}"
+        return f"{f.read().replace('/', '_')},{Path(file).with_suffix('.jpg')}"
 
 def generate():
     """
