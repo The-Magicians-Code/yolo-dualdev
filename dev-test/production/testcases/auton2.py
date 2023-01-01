@@ -47,19 +47,26 @@ def write_detections_x86_64(detection, stream, class_id, label):
     with open(label, "w") as f:
         writer = csv.writer(f)
         writer.writerows(dets)
-        
+
     print(scores)
 def main():
     image_folders = glob("../datasets/*/")
     all_classes = os.listdir("../datasets")[1:]
-    # image_folders = image_folders[:1]
-    # all_classes = all_classes[0]
-    # print(image_folders, all_classes)
+    # image_folders = image_folders[42:]
+    # all_classes = all_classes[42:]
+    print(image_folders, all_classes)
     for class_id, (folder, class_name) in enumerate(zip(image_folders, all_classes)):
+        print(f"Starting labeling: {folder}")
         image_labels = [Path(image).with_suffix(".txt") for image in glob(f"{folder}*.jpg")]
         images = [cv2.imread(file) for file in glob(f"{folder}*.jpg")]
-        # print(class_id)
-        # print(image_labels[0])
+
+        # inputs = []
+        # for idx, image in enumerate(images):
+        #     try:
+        #         inputs.append(cv2.resize(image, (img_size, img_size)))
+        #     except:
+        #         raise IndexError(f"Image problematic! {image_labels[idx].name}")
+                
         inputs = [cv2.resize(image, (img_size, img_size)) for image in images]
         for input, label in zip(inputs, image_labels):
             results = model(input, size=img_size)
