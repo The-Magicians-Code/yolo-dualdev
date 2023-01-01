@@ -49,30 +49,30 @@ def write_detections_x86_64(detection, stream, class_id, label):
         writer.writerows(dets)
 
     print(scores)
+
 def main():
     image_folders = glob("../datasets/*/")
-    all_classes = os.listdir("../datasets")[1:]
+    all_classes = os.listdir("../datasets")
     # image_folders = image_folders[42:]
     # all_classes = all_classes[42:]
-    print(image_folders, all_classes)
-    for class_id, (folder, class_name) in enumerate(zip(image_folders, all_classes)):
-        print(f"Starting labeling: {folder}")
-        image_labels = [Path(image).with_suffix(".txt") for image in glob(f"{folder}*.jpg")]
-        images = [cv2.imread(file) for file in glob(f"{folder}*.jpg")]
+    print(image_folders, all_classes, len(image_folders), len(all_classes))
+    # for class_id, (folder, class_name) in enumerate(zip(image_folders, all_classes)):
+    #     print(f"Starting labeling: {folder}")
+    #     image_labels = [Path(image).with_suffix(".txt") for image in glob(f"{folder}*.jpg")]
+    #     images = [cv2.imread(file) for file in glob(f"{folder}*.jpg")]
 
-        # inputs = []
-        # for idx, image in enumerate(images):
-        #     try:
-        #         inputs.append(cv2.resize(image, (img_size, img_size)))
-        #     except:
-        #         raise IndexError(f"Image problematic! {image_labels[idx].name}")
+    #     # inputs = []
+    #     # for idx, image in enumerate(images):
+    #     #     try:
+    #     #         inputs.append(cv2.resize(image, (img_size, img_size)))
+    #     #     except:
+    #     #         raise IndexError(f"Image problematic! {image_labels[idx].name}")
                 
-        inputs = [cv2.resize(image, (img_size, img_size)) for image in images]
-        for input, label in zip(inputs, image_labels):
-            results = model(input, size=img_size)
-            detections = results.pandas().xyxy
-            # print(detections[0])
-            write_detections_x86_64(detections[0], input, class_id, label)
+    #     inputs = [cv2.resize(image, (img_size, img_size)) for image in images]
+    #     for input, label in zip(inputs, image_labels):
+    #         results = model(input, size=img_size)
+    #         detections = results.pandas().xyxy
+    #         write_detections_x86_64(detections[0], input, class_id, label)
     # print(all_classes)
 
 main()

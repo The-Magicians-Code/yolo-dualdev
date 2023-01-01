@@ -48,20 +48,18 @@ def generate():
     with open("/mnt/d/yolodatasets/ships2/all_classes.txt", "w") as all:
         all.write("\n".join(classes))
 
-# generate()
+    with open("/mnt/d/yolodatasets/ships2/all_classes.txt", "r") as all:
+        classes = all.read().split("\n")
+        print(classes)
+        [Path(f"/mnt/d/yolodatasets/ships2/{folder}").mkdir(parents=True, exist_ok=True) for folder in classes]
 
-with open("/mnt/d/yolodatasets/ships2/all_classes.txt", "r") as all:
-    classes = all.read().split("\n")
-    print(classes)
-    [Path(f"/mnt/d/yolodatasets/ships2/{folder}").mkdir(parents=True, exist_ok=True) for folder in classes]
+    with open("/mnt/d/yolodatasets/ships2/filtered.txt", "r") as all:
+        items = all.read().split("\n")
+    
+    return items
 
-with open("/mnt/d/yolodatasets/ships2/filtered.txt", "r") as all:
-    items = all.read().split("\n")
-
-folders, photos = zip(*[i.split(",") for i in items])
-# print(Path(photos[0]).parent.parent / folders[0])
-
-# root = Path("/path/to/your/root/dir")
+# items = generate()
+# folders, photos = zip(*[i.split(",") for i in items])
 
 def moveall(item):
     photo, folder = item
@@ -70,10 +68,22 @@ def moveall(item):
     except FileNotFoundError:
         print(f"File not found, most likely moved to destination {folder} already: {photo}")
 
-with Pool(cpu_count(logical=False)) as p:
-    p.map(moveall, zip(photos, folders))
-# [Path(photo).rename(Path(photo).parent.parent / folder / Path(photo).name) for (photo, folder) in zip(photos, folders)]
+# with Pool(cpu_count(logical=False)) as p:
+#     p.map(moveall, zip(photos, folders))
 
-# for file in root.glob("*.pdf"):
-#     folder_name = file.stem.rpartition("_")[-1]
-#     file.rename(root / folder_name / file.name)
+folders = glob("/mnt/d/yolodatasets/ships2/*/")
+print(folders)
+imgs = list(chain.from_iterable([glob(f"{file}*.txt") for file in folders]))
+
+def moveto(photo):
+    try:
+        Path(photo).rename(Path(photo).parent.parent / "labels" / Path(photo).name)
+    except FileNotFoundError:
+        print(f"File not found, most likely moved to destination labels already: {photo}")
+
+with Pool(cpu_count(logical=False)) as p:
+    p.map(moveto, imgs)
+
+# print(imgs[0])
+
+# print(Path(imgs[0]).parent.parent / "train" / Path(imgs[0]).name)
