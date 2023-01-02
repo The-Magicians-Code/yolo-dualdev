@@ -7,6 +7,7 @@
 
 import cv2
 import time
+import yaml
 import torch
 import argparse
 import platform
@@ -19,6 +20,7 @@ parser.add_argument('--input-video', required=True, nargs="+", help="Read video 
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
 parser.add_argument('--perf', action='store_true')
+parser.add_argument('--classes', help='Trained model data.yaml file which consists of custom dataset classes')
 parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
 args = parser.parse_args()
 
@@ -31,6 +33,19 @@ if args.input_video:
     videos = args.input_video
 else:
     parser.error("--input-video requires an argument")
+
+if args.classes:
+    with open(args.classes, "r") as stream:
+        try:
+            data = yaml.safe_load(stream)["names"]
+        except yaml.YAMLError as exc:
+            print(exc)
+            raise ValueError(f"{args.classes} not found or unreadable")
+        print(f"Found {len(data)} classes")
+        custom_labels = True
+else:
+    print("Custom classes not provided")
+    custom_labels = False
 
 if args.rt_model:
     if not Path(f"models/{args.rt_model}.engine").exists():
@@ -85,7 +100,7 @@ def openstreams(cameras):
     states, frames = zip(*[camera.read() for camera in cameras])
     return states, frames
 
-def plotdetections_x86_64(detection, stream):
+def plotdetections_x86_64(detection, stream, custom_labels):
     height, width = stream.shape[:2]
     for i in range(detection.shape[0]):    
         # if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
@@ -100,6 +115,8 @@ def plotdetections_x86_64(detection, stream):
         score_txt = f"{(confidence * 100.0):.0f}%"
         
         label = detection.iloc[i]["name"]
+        if custom_labels:
+            label = data[int(label.replace("class", ""))]
         
         cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), (0, int(confidence * 255), int(255 - confidence * 255)), thickness)
         # cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
@@ -113,7 +130,7 @@ def plotdetections_x86_64(detection, stream):
     
     return stream
 
-def plotdetections_aarch64(detection, stream):
+def plotdetections_aarch64(detection, stream, custom_labels):
     for i in range(detection.shape[0]):    
         if detection.iloc[i]["class"] != 8: # 8 - boat, ship, vessel
             continue
@@ -125,11 +142,14 @@ def plotdetections_aarch64(detection, stream):
 
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{(confidence * 100.0):.0f}%"
+        
+        if custom_labels:
+            label = data[int(label.replace("class", ""))]
 
         cv2.rectangle(stream, (xmin, ymin), (xmax, ymax), colour, thickness)
         font = cv2.FONT_HERSHEY_SIMPLEX
 
-        cv2.putText(stream, score_txt, (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
+        cv2.putText(stream, f"{label}: {score_txt}", (xmin, ymax - 5), font, fontscale, (255, 255, 255), fontthick, cv2.FILLED)
     
     return stream
 
@@ -188,7 +208,7 @@ def main():
                     inputs = streams
                 results = model(inputs, size=img_size)
                 detections = results.pandas().xyxy
-                streams = [plotdetections(detection, stream) for detection, stream in zip(detections, streams)]
+                streams = [plotdetections(detection, stream, custom_labels) for detection, stream in zip(detections, streams)]
 
             cv2.putText(streams[0], f"{fps:.0f}", fps_pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 2)
             outs = cv2.hconcat(streams)
