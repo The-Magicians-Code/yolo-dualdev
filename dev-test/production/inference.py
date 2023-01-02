@@ -151,6 +151,7 @@ def main():
     else:
         output_video = None
     
+    # Platform dependent function allocation
     if platform.machine() == "x86_64":
         plotdetections = plotdetections_x86_64
     elif platform.machine() == "aarch64":
@@ -160,7 +161,6 @@ def main():
     tau = time.time()
     smoothing = 0.9
     fps_pos = (32, height - 32)
-    top_left = (32, 38)
 
     with torch.no_grad():
         while True:
@@ -174,9 +174,10 @@ def main():
                     [camera.release() for camera in cams]
                     cv2.destroyAllWindows()
                 break
+
             # FPS calculation
             now = time.time()
-            if now > tau:  # avoid div0
+            if now > tau:  # Avoid DivisionByZeroError
                 fps = fps * smoothing + 0.1/(now - tau)
             tau = now
             
@@ -188,8 +189,7 @@ def main():
                 results = model(inputs, size=img_size)
                 detections = results.pandas().xyxy
                 streams = [plotdetections(detection, stream) for detection, stream in zip(detections, streams)]
-                # Display fps
-            # [cv2.putText(stream, pos, top_left, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 140, 255), 2) for pos, stream in zip(["Port", "Bow", "Starboard"], streams)]
+
             cv2.putText(streams[0], f"{fps:.0f}", fps_pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 2)
             outs = cv2.hconcat(streams)
             
@@ -197,7 +197,7 @@ def main():
                 output_video.write(outs)
             
             if args.perf:
-                print(f"{fps:.2f}")   # Display fps  
+                print(f"{fps:.2f}")   # Display fps in terminal  
             else:
                 online, buffer = cv2.imencode('.jpg', outs)
                 streamer.frame_to_stream = buffer.tobytes()

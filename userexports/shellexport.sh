@@ -8,14 +8,14 @@ declare -a models=(
    # "x" 
    # "n6" 
    # "s6"
-   "m6" 
+   # "m6" 
    # "l6" 
-   # "x6"
+   "x6"
 )
 # Model input size (a x a)
-size=640
+size=1280
 # Input batch size
-batch=1
+batch=3
 
 echo "Making the folder for models"
 mkdir models_"$size"x"$size"_batch_"$batch"
