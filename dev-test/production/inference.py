@@ -21,7 +21,7 @@ parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for objec
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
 parser.add_argument('--perf', action='store_true')
 parser.add_argument('--classes', help='Trained model data.yaml file which consists of custom dataset classes')
-parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
+parser.add_argument('--rt-model', help="YOLOv5 RT Neural Network for object detection --rt-model models/yolov5m6_640x640_batch_1.engine")
 args = parser.parse_args()
 
 if args.rec:
@@ -48,10 +48,12 @@ else:
     custom_labels = False
 
 if args.rt_model:
-    if not Path(f"models/{args.rt_model}.engine").exists():
-        raise FileNotFoundError(f"Did not find RT model {args.rt_model}.engine in /models/ folder. Specify model name ONLY without .engine suffix and make sure it is located in models/ folder")
+    if not Path(f"{args.rt_model}").exists():
+        raise FileNotFoundError(f"Did not find RT model {args.rt_model}!")
+    if Path(f"{args.rt_model}").suffix != ".engine":
+        raise ValueError(f"This is not a TensorRT optimised model! {args.rt_model} no .engine suffix found!")
     
-    model = torch.hub.load("ultralytics/yolov5", "custom", f"models/{args.rt_model}.engine") # This line is important since it contains RT execution
+    model = torch.hub.load("ultralytics/yolov5", "custom", f"{args.rt_model}") # This line is important since it contains RT execution
     input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
     img_size = input_params[-1] # One dimension since n x n shape
     batch_size = input_params[0]

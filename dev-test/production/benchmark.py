@@ -17,7 +17,7 @@ parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for objec
 parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
 parser.add_argument('--batch', default = 1, help="YOLOv5 unoptimised Neural Network batch size --batch 1")
 parser.add_argument('--precision', choices=["fp32", "fp16", "int8"], help="YOLOv5 TensorRT optimised Neural Network precision --precision fp32")
-parser.add_argument('--rt-model', help="YOLOv5 TensorRT Neural Network for object detection --rt-model yolov5m6_640x640_batch_1")
+parser.add_argument('--rt-model', help="YOLOv5 TensorRT Neural Network for object detection --rt-model models/yolov5m6_640x640_batch_1.engine")
 parser.add_argument('-v', '--verbose', action="store_true", help="Benchmark verbose, default False")
 parser.add_argument('-e', '--export', action="store_true", help="Benchmark export results into .txt file, default False")
 args = parser.parse_args()
@@ -31,15 +31,17 @@ except ImportError as e:
 if args.rt_model:
     if not args.precision:
         parser.error("--rt-model argument requires --precision argument")
-    if not Path(f"models/{args.rt_model}.engine").exists():
-        raise FileNotFoundError(f"Did not find RT model {args.rt_model}.engine in /models/ folder. Specify model name ONLY without .engine suffix and make sure it is located in models/ folder")
-    model_name = f"{args.rt_model}.engine"
-    model = torch.hub.load("ultralytics/yolov5", "custom", f"models/{args.rt_model}.engine") # This line is important since it contains RT execution
+    if not Path(f"{args.rt_model}").exists():
+        raise FileNotFoundError(f"Did not find RT model {args.rt_model}!")
+    if Path(f"{args.rt_model}").suffix != ".engine":
+        raise ValueError(f"This is not a TensorRT optimised model! {args.rt_model} no .engine suffix found!")
+    
+    model_name = Path(f"{args.rt_model}").name
+    model = torch.hub.load("ultralytics/yolov5", "custom", f"{args.rt_model}") # This line is important since it contains RT execution    
     input_params = model.model.bindings["images"].shape  # Retrieve input size of the model
     precision = args.precision
-    outfile = f"{args.rt_model}_RT.txt"
-
-    print(f"[o] {args.rt_model} model optimised with TensorRT @{precision} with input: {input_params}")
+    outfile = f"{Path(model_name).stem}_RT.txt"
+    print(f"[o] {model_name} model optimised with TensorRT @{precision} with input: {input_params}")
 elif args.model:
     if not args.imsize:
         parser.error("--model argument requires --imsize argument")
