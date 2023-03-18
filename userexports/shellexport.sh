@@ -12,7 +12,7 @@ declare -a models=(
    # "l6" 
    "x6"
 )
-# Model input size (a x a)
+# Model input size a, since (a x a)
 size=1280
 # Input batch size
 batch=3

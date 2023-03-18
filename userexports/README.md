@@ -1,1 +1,1 @@
-This folder is used with export_cont.sh script which initialises the container which consists of YOLO models, which then can be exported using the shellexport script. Move exported models to /production/ folder when working in dev container
+This folder is used with ``export_cont.sh`` script which initialises the container which consists of YOLO models, which then can be exported using the ``shellexport.sh`` script. Move exported models to ``/production/models/`` folder when working in dev container

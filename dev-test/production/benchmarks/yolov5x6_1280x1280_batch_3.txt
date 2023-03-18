@@ -3,9 +3,10 @@ Input shape: torch.Size([3, 3, 1280, 1280])
 Model precision: fp32
 GPU: NVIDIA GeForce RTX 3090 Ti
 Stats for 1000 runs:
-Average inference time: 135.11 ms
+Confidence: 86.78 %
+Average inference time: 139.59 ms
 Average FPS: 7
  
 CSV format:
-Model_name,Batch_size,Channels,Image_size,Precision,GPU,Number_of_runs,Avg_inference_time_(ms),Avg_FPS
-yolov5x6,3,3,1280x1280,fp32,NVIDIA GeForce RTX 3090 Ti,1000,135.10808444023132,7.401481592630949
+Model_name,Batch_size,Channels,Image_size,Precision,GPU,Number_of_runs,Avg_inference_time_(ms),Avg_FPS,Avg_confidence(0-1)
+yolov5x6,3,3,1280x1280,fp32,NVIDIA GeForce RTX 3090 Ti,1000,139.59413194656372,7.163624903536758,0.8678370118141174

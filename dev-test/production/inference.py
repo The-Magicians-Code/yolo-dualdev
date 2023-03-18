@@ -3,7 +3,7 @@
 # @Github: https://github.com/The-Magicians-Code
 # @Script: inference.py
 # @Description: Perform inference on user defined input streams, using preconfigured YOLOv5 TensorRT model
-# @Last modified: 2022/11/30
+# @Last modified: 2023/03/18
 
 import cv2
 import time
@@ -209,6 +209,7 @@ def main():
                 else:
                     inputs = streams
                 results = model(inputs, size=img_size)
+                print(results)
                 detections = results.pandas().xyxy
                 streams = [plotdetections(detection, stream, custom_labels) for detection, stream in zip(detections, streams)]
 
