@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Converts user specified ONNX model to TensorRT .engine model
+# @Author: Tanel Treuberg
+# @Github: https://github.com/The-Magicians-Code
+# @Script: model2trt.sh
+# @Description: Convert user specified ONNX model to TensorRT model
+# @Last modified: 2023/03/18
 
 if [ ! -f /usr/local/bin/trtexec ]; then
     echo "trtexec not set up. initialising"

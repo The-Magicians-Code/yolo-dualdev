@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# @Author: Tanel Treuberg
+# @Github: https://github.com/The-Magicians-Code
+# @Script: JETSON_torchinstall.sh
+# @Description: Install pytorch and torchvision on Jetson Xavier
+# @Last modified: 2023/03/18
+
 # This script is meant solely for running on Nvidia JETSON inference device
 # Works on AGX XAVIER currently, modified according to this link
 # https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
