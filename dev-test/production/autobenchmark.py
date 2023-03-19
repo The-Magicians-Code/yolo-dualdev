@@ -12,6 +12,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Benchmark multiple neural networks at once")
 parser.add_argument('-m', '--merge', action="store_true", help="Merge benchmark results into a .csv file, if not requested, then benchmarks will be restarted and then merged into a file, default False")
+parser.add_argument('--runs', default = 1000, type=int, help="How many benchmarking runs on a model, default 1000")
 args = parser.parse_args()
 
 def autobenchmark():
@@ -27,10 +28,10 @@ def autobenchmark():
     print(f"Benchmarking models: {rt_models, models}")
 
     for model in rt_models:
-        call(f"python3 benchmark.py --rt-model {model} --precision fp16 --export".split())
+        call(f"python3 benchmark.py --rt-model {model} --precision fp16 --export --runs {args.runs}".split())
 
     for model, imsize, batchsize in zip(models_as_args, imsizes, batchsizes):
-        call(f"python3 benchmark.py --model {model} --imsize {imsize} --batch {batchsize} --export".split())
+        call(f"python3 benchmark.py --model {model} --imsize {imsize} --batch {batchsize} --export --runs {args.runs}".split())
 
 def mergedata():
     files = glob("benchmarks/*.txt")

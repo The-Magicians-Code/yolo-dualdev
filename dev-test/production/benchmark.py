@@ -15,8 +15,9 @@ from subprocess import Popen, DEVNULL, STDOUT
 
 parser = argparse.ArgumentParser(description="Neural Network benchmark script")
 parser.add_argument('--model', help="YOLOv5 unoptimised Neural Network for object detection --model yolov5m6")
-parser.add_argument('--imsize', help="YOLOv5 unoptimised Neural Network input size --imsize 640")
-parser.add_argument('--batch', default = 1, help="YOLOv5 unoptimised Neural Network batch size --batch 1")
+parser.add_argument('--imsize', type=int, help="YOLOv5 unoptimised Neural Network input size --imsize 640")
+parser.add_argument('--batch', default = 1, type=int, help="YOLOv5 unoptimised Neural Network batch size --batch 1")
+parser.add_argument('--runs', default = 1000, type=int, help="How many benchmarking runs on a model, default 1000")
 parser.add_argument('--precision', choices=["fp32", "fp16", "int8"], help="YOLOv5 TensorRT optimised Neural Network precision --precision fp32")
 parser.add_argument('--rt-model', help="YOLOv5 TensorRT Neural Network for object detection --rt-model models/yolov5m6_640x640_batch_1.engine")
 parser.add_argument('-v', '--verbose', action="store_true", help="Benchmark verbose, default False")
@@ -49,7 +50,7 @@ elif args.model:
     model_name = args.model
     model = torch.hub.load("ultralytics/yolov5", args.model, pretrained=True) # Load unoptimised model from Ultralytics's servers
     precision = "fp32"
-    input_params = (int(args.batch), 3, int(args.imsize), int(args.imsize))
+    input_params = (args.batch, 3, args.imsize, args.imsize)
     outfile = f"{args.model}_{args.imsize}x{args.imsize}_batch_{args.batch}.txt"
     print(f"[o] {args.model} model with input: {input_params}")
 else:
@@ -111,4 +112,4 @@ def benchmark(model, input_shape=(1024, 1, 32, 32), dtype='fp32', nwarmup=50, nr
         with open(f"benchmarks/{outfile}", "w") as out:
             out.write("\n".join(outdata))
 
-benchmark(model, input_shape=input_params, dtype=precision, verbose=args.verbose, export=args.export)
+benchmark(model, input_shape=input_params, dtype=precision, nruns=args.runs, verbose=args.verbose, export=args.export)
