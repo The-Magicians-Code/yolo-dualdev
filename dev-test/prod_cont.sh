@@ -2,6 +2,7 @@
 # cat /etc/nv_tegra_release
 # apt-cache show nvidia-jetpack
 
+# Jetson Nano at Jetpack 4.6.1
 l4tversion=32.7.1
 # torchversion=1.10
 
