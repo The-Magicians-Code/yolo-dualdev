@@ -9,12 +9,15 @@ FROM nvcr.io/nvidia/l4t-ml:r$l4tversion-py3
 
 # COPY opencv_install.sh /tmp/opencv_install.sh
 # RUN cd /tmp && bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
-RUN apt-get update && apt-get install python3-tk -y
-RUN pip3 install psutil tqdm flask cryptography
-RUN pip3 install seaborn flask-opencv-streamer --no-dependencies
-
 # This is to avoid ImportError: /lib/aarch64-linux-gnu/libGLdispatch.so.0: cannot allocate memory in static TLS block
-RUN export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0
+# This is to avoid ImportError: /lib/aarch64-linux-gnu/libGLdispatch.so.0: cannot allocate memory in static TLS block
+# RUN export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0
+
+ENV LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0
+
+RUN apt-get update && apt-get install python3-tk -y && \
+pip3 install psutil tqdm flask cryptography && \
+pip3 install seaborn flask-opencv-streamer --no-dependencies
 
 WORKDIR /code
 EXPOSE 3000
