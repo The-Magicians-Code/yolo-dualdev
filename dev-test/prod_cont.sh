@@ -13,4 +13,4 @@ l4tversion=35.1.0
 # sudo docker run -it --rm --runtime nvidia --network host nvcr.io/nvidia/l4t-pytorch:r${l4tversion}-pth${torchversion}-py3
 
 sudo docker build -t cont_test . -f prod.Dockerfile --build-arg l4tversion=$l4tversion #--build-arg torchversion=$torchversion
-sudo docker run --rm -i -d --runtime nvidia -v $PWD/production:/code --name torchcont cont_test
+sudo docker run --rm -i -d --runtime nvidia -v $PWD/production:/code -p 3000:3000 --name torchcont cont_test

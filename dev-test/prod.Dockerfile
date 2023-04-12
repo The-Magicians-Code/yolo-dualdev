@@ -10,9 +10,9 @@ FROM nvcr.io/nvidia/l4t-ml:r$l4tversion-py3
 # COPY opencv_install.sh /tmp/opencv_install.sh
 # RUN cd /tmp && bash opencv_install.sh ${OPENCV_URL} ${OPENCV_DEB}
 RUN apt-get update && apt-get install python3-tk -y
-RUN pip3 install psutil tqdm flask
+RUN pip3 install psutil tqdm flask cryptography
 RUN pip3 install seaborn flask-opencv-streamer --no-dependencies
 
 WORKDIR /code
-
-RUN ["python3"]
+EXPOSE 3000
+# RUN ["python3"]
