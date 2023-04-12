@@ -20,5 +20,5 @@ pip3 install psutil tqdm flask cryptography && \
 pip3 install seaborn flask-opencv-streamer --no-dependencies
 
 WORKDIR /code
-EXPOSE 3000
+EXPOSE 3030
 # RUN ["python3"]

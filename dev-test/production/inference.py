@@ -178,7 +178,7 @@ def main():
     # Platform dependent function allocation
     if platform.machine() == "x86_64":
         plotdetections = plotdetections_x86_64
-    elif platform.machine() == "aarch64" and resize:
+    elif platform.machine() == "aarch64" and resize: # For some reason Docker container prefers this setting
         plotdetections = plotdetections_x86_64
     elif platform.machine() == "aarch64":
         plotdetections = plotdetections_aarch64
@@ -213,7 +213,7 @@ def main():
                 else:
                     inputs = streams
                 results = model(inputs, size=img_size)
-                print(results)
+                # print(results)
                 detections = results.pandas().xyxy
                 streams = [plotdetections(detection, stream, custom_labels) for detection, stream in zip(detections, streams)]
 
@@ -224,7 +224,7 @@ def main():
                 output_video.write(outs)
             
             if args.perf:
-                print(f"{fps:.2f}")   # Display fps in terminal  
+                print(f"FPS: {fps:.2f}, {results}")   # Display fps in terminal  
             else:
                 online, buffer = cv2.imencode('.jpg', outs)
                 streamer.frame_to_stream = buffer.tobytes()
