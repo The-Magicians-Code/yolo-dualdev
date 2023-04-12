@@ -13,4 +13,6 @@ RUN apt-get update && apt-get install python3-tk -y
 RUN pip3 install psutil tqdm flask
 RUN pip3 install seaborn flask-opencv-streamer --no-dependencies
 
+WORKDIR /code
+
 RUN ["python3"]
