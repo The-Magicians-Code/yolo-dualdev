@@ -3,7 +3,10 @@
 # apt-cache show nvidia-jetpack
 
 # Jetson Nano at Jetpack 4.6.1
-l4tversion=32.7.1
+# l4tversion=32.7.1
+# Jetson AGX Xavier at Jetpack 5.0.2
+l4tversion=35.1.0
+
 # torchversion=1.10
 
 # sudo docker pull nvcr.io/nvidia/l4t-pytorch:r${l4tversion}-pth${torchversion}-py3
