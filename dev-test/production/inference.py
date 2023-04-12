@@ -145,7 +145,7 @@ def plotdetections_aarch64(detection, stream, custom_labels):
 
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{(confidence * 100.0):.0f}%"
-        
+
         label = detection.iloc[i]["name"]
         if custom_labels:
             label = data[int(label.replace("class", ""))]
@@ -177,6 +177,8 @@ def main():
     
     # Platform dependent function allocation
     if platform.machine() == "x86_64":
+        plotdetections = plotdetections_x86_64
+    elif platform.machine() == "aarch64" and resize:
         plotdetections = plotdetections_x86_64
     elif platform.machine() == "aarch64":
         plotdetections = plotdetections_aarch64
