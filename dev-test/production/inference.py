@@ -146,6 +146,7 @@ def plotdetections_aarch64(detection, stream, custom_labels):
         confidence = detection.iloc[i]['confidence']
         score_txt = f"{(confidence * 100.0):.0f}%"
         
+        label = detection.iloc[i]["name"]
         if custom_labels:
             label = data[int(label.replace("class", ""))]
 
