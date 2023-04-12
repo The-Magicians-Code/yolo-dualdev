@@ -78,7 +78,8 @@ elif platform.machine() == "aarch64":   # For Jetson
     decoder = "nvv4l2decoder"
     video_converter = "nvvidconv"
     app_port = 3030
-    resize = False
+    # resize = False
+    resize = True
 
 # Setup the cameras
 cams = [cv2.VideoCapture(f'filesrc location={video} ! qtdemux ! queue ! h264parse ! {decoder} ! {video_converter} ! video/x-raw,format=BGRx,width=1280,height=720 ! queue ! videoconvert ! queue ! video/x-raw, format=BGR ! appsink', cv2.CAP_GSTREAMER) for video in videos]
