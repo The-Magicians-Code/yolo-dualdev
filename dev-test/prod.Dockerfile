@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install python3-tk -y
 RUN pip3 install psutil tqdm flask cryptography
 RUN pip3 install seaborn flask-opencv-streamer --no-dependencies
 
+# This is to avoid ImportError: /lib/aarch64-linux-gnu/libGLdispatch.so.0: cannot allocate memory in static TLS block
+RUN export LD_PRELOAD=/lib/aarch64-linux-gnu/libGLdispatch.so.0
+
 WORKDIR /code
 EXPOSE 3000
 # RUN ["python3"]
