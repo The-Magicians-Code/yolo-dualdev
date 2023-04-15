@@ -2,10 +2,7 @@
 # cat /etc/nv_tegra_release
 # apt-cache show nvidia-jetpack
 
-# Jetson Nano at Jetpack 4.6.1
-# l4tversion=32.7.1
-# Jetson AGX Xavier at Jetpack 5.0.2
-l4tversion=35.1.0
+# Automatically determine L4T version
 l4t=($(dpkg-query --show nvidia-l4t-core))
 l4t=${l4t[1]%-*}
 
