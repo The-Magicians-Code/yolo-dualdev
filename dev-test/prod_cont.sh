@@ -3,8 +3,14 @@
 # apt-cache show nvidia-jetpack
 
 # Automatically determine L4T version
+# If container could not be built, please check the L4T and Jetpack version from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-ml
+# and overwrite the l4t variable manually
 l4t=($(dpkg-query --show nvidia-l4t-core))
 l4t=${l4t[1]%-*}
 
-sudo docker build -t cont_test . -f prod.Dockerfile --build-arg l4tversion=$l4t
-sudo docker run --rm -i -d --runtime nvidia -v $PWD/production:/code -p 3000:3000 --name torchcont cont_test
+if sudo docker build -t cont_test . -f prod.Dockerfile --build-arg l4tversion=$l4t; then
+    printf "Successfully built container!\n"
+    sudo docker run --rm -i -d --runtime nvidia -v $PWD/production:/code -p 3000:3000 --name torchcont cont_test
+else
+    printf "Please check the L4T and Jetpack version from https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-ml and overwrite the l4t variable manually\n"
+fi
