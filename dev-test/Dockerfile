@@ -63,5 +63,8 @@ RUN make -j$(nproc)
 RUN make install
 RUN ldconfig
 
+RUN pip install ultralytics --no-deps && \
+pip install thop
+
 WORKDIR /workspace/torching
 EXPOSE 3000
