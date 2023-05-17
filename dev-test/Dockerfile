@@ -1,7 +1,7 @@
 FROM nvcr.io/nvidia/pytorch:22.01-py3
 
 ARG DEBIAN_FRONTEND=noninteractive
-# RUN apt-get update -y
+RUN apt-get update -y
 
 # Works, but without Gstreamer
 # RUN apt-get install ffmpeg libsm6 libxext6 -y
@@ -18,7 +18,6 @@ RUN pip install cryptography flask
 
 # Install base dependencies + gstreamer
 RUN pip uninstall -y opencv-python
-RUN apt-get -y update
 RUN apt-get -y install build-essential
 RUN apt-get -y install pkg-config
 RUN apt-get -y install libgstreamer1.0-0 \
@@ -40,14 +39,14 @@ ocl-icd-opencl-dev
 WORKDIR /
 RUN git clone https://github.com/opencv/opencv.git
 WORKDIR /opencv
-RUN git checkout 4.2.0
+RUN git checkout 4.7.0
 
 # Build OpenCV
 RUN mkdir /opencv/build
 WORKDIR /opencv/build
 RUN ln -s /opt/conda/lib/python3.6/site-packages/numpy/core/include/numpy /usr/include/numpy
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
--D INSTALL_PYTHON_EXAMPLES=ON \
+-D INSTALL_PYTHON_EXAMPLES=OFF \
 -D INSTALL_C_EXAMPLES=OFF \
 -D PYTHON_EXECUTABLE=$(which python) \
 -D BUILD_opencv_python2=OFF \
@@ -56,9 +55,9 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 -D PYTHON3_INCLUDE_DIR=$(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
 -D PYTHON3_PACKAGES_PATH=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
 -D WITH_GSTREAMER=ON \
--D BUILD_EXAMPLES=ON ..
-RUN make -j$(nproc)
-
+-D BUILD_EXAMPLES=OFF ..
+#RUN make -j$(nproc)
+RUN make -j4
 # Install OpenCV
 RUN make install
 RUN ldconfig
