@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: shellexport.sh
 # @Description: Automatically export user defined yolov5 models as ONNX formatted models for later TensorRT conversion
-# @Last modified: 2023/03/18
 
 # Define YOLOv5 model type
 declare -a models=(

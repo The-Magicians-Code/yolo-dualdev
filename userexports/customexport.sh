@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: customexport.sh
 # @Description: Export user trained model as ONNX model using pretrained weights and classes file
-# @Last modified: 2023/03/18
 
 
 # Model weights file name
