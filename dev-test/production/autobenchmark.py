@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: autobenchmark.py
 # @Description: Benchmark multiple all neural network models sequentially
-# @Last modified: 2023/03/18
 
 from glob import glob
 from subprocess import call

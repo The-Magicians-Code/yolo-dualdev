@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: inference.py
 # @Description: Perform inference on user defined input streams, using preconfigured YOLOv5 TensorRT model
-# @Last modified: 2023/03/18
 
 import cv2
 import time

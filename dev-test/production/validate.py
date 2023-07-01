@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# @Author: Tanel Treuberg
+# @Github: https://github.com/The-Magicians-Code
+# @Description: Perform model accuracy validation on predefined, annotated datasets
+
 import cv2
 import os
 import torch

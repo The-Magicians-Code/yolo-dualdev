@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: benchmark.py
 # @Description: Perform performance benchmark on user defined neural network model
-# @Last modified: 2023/03/18
 
 import cv2
 import time

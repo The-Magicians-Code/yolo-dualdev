@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # @Author: Tanel Treuberg
 # @Github: https://github.com/The-Magicians-Code
-# @Script: rtautoconvert.sh
 # @Description: Automatically converts all ONNX models in /models/ folder to TensorRT format
-# @Last modified: 2023/03/22
 
 if [ ! -f /usr/local/bin/trtexec ]; then
     echo "trtexec not set up. initialising"
