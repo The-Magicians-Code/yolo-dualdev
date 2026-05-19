@@ -1,3 +1,4 @@
+# Yolo Dualdev [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/The-Magicians-Code/yolo-dualdev)
 This project contains tools for developing YOLOv5 models for inference on Nvidia Jetson devices. 
 Dev-test folder has user tuned Docker container which has been configured to run with most 
 compatible version of software on PC, which is also installed on Jetson device. 
